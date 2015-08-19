@@ -1,0 +1,36 @@
+<plugin id="com.scg.crypt" version="0.0.1">
+  <name>CordovaCrypt</name>
+  <description>
+    A sample Apache Cordova plugin that makes cryptographic methods available.
+  </description>
+  <author email="chad.godsey@systematicgroup.com" href="http://systematicgroup.com">
+    Chad Godsey
+  </author>
+  <platform name="android">
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="CordovaCrypt">
+        <param name="android-package" value="com.scg.crypt.CordovaCrypt" />
+      </feature>
+    </config-file>
+    <source-file src="src/android/BluetoothLePlugin.java" target-dir="src/com/scg" />
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+      <uses-permission android:name="android.permission.BLUETOOTH"/>
+      <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    </config-file>
+  </platform>
+  <platform name="ios">
+    <config-file target="config.xml" parent="/*">
+      <feature name="CordovaCrypt">
+        <param name="ios-package" value="CordovaCrypt" />
+      </feature>
+    </config-file>
+    <config-file target="*-Info.plist" parent="UIBackgroundModes">
+      <array>
+        <string>bluetooth-central</string>
+      </array>
+    </config-file>
+    <header-file src="src/ios/CordovaCrypt.h" />
+    <source-file src="src/ios/CordovaCrypt.m" />
+    <framework src="CommonCrypto.framework" />
+  </platform>
+</widget>
