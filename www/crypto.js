@@ -1,5 +1,5 @@
 var cryptoName = "CordovaCrypt";
-var crypto = {
+var AESCrypt = {
   initialize: function(successCallback, errorCallback, params) {
     cordova.exec(successCallback, errorCallback, cryptoName, "initialize", [params]);
   },
@@ -10,4 +10,4 @@ var crypto = {
     cordova.exec(successCallback, errorCallback, cryptoName, "decyrpt", [params]);
   }
 }
-module.exports = crypto;
+module.exports = AESCrypt;

@@ -75,7 +75,7 @@ public class CordovaCrypt extends CordovaPlugin
     JSONObject returnObj = new JSONObject();
     String decryptedMsg = AESCrypt.encrypt(publickey, message);
 
-    addProperty(returnObj, keyMessage, encryptedMsg);
+    addProperty(returnObj, keyMessage, decryptedMsg);
 
     PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
     pluginResult.setKeepCallback(true);

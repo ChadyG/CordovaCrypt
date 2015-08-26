@@ -1,4 +1,4 @@
-<plugin id="com.scg.crypt" version="0.0.1">
+<plugin id="com.scg.crypto" version="0.0.1">
   <name>CordovaCrypt</name>
   <description>
     A sample Apache Cordova plugin that makes cryptographic methods available.
@@ -6,13 +6,18 @@
   <author email="chad.godsey@systematicgroup.com" href="http://systematicgroup.com">
     Chad Godsey
   </author>
+  <js-module src="www/crypto.js" name="AESCrypt">
+    <clobbers target="window.AESCrypt" />
+  </js-module>
   <platform name="android">
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="CordovaCrypt">
-        <param name="android-package" value="com.scg.crypt.CordovaCrypt" />
+        <param name="android-package" value="com.scg.crypto.CordovaCrypt" />
+        <param name="android-package" value="com.scottyb.aescrypt.AESCrypt" />
       </feature>
     </config-file>
-    <source-file src="src/android/CordovaCrypt.java" target-dir="src/com/scg" />
+    <source-file src="src/android/AESCrypt/AESCrypt.java" target-dir="src/com/scottyab" />
+    <source-file src="src/android/CordovaCrypt.java" target-dir="src/com/scg/crypto" />
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.BLUETOOTH"/>
       <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>

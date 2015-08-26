@@ -16,15 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+var AESCrypt;
+
+
 var app = {
     // Application Constructor
     initialize: function() {
         this.bindEvents();
         $('#encode').click(function(e){
-          $('#output').html(crypto.encrypt($('#inMessage').val(), $('#inPrivate').val()));
+          crypto.encrypt(function(args){
+              $('#output').html(args.message);
+            },
+            function(args){},
+            $('#inMessage').val(), $('#inPrivate').val());
         })
         $('#decode').click(function(e){
-          $('#output').html(crypto.decrypt($('#inMessage').val(), $('#inPublic').val()));
+          crypto.decrypt(function(args){
+              $('#output').html(args.message);
+            },
+            function(args){},
+            $('#inMessage').val(), $('#inPublic').val())
         })
     },
     // Bind Event Listeners
