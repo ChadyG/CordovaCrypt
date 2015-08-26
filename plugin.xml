@@ -13,10 +13,9 @@
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="CordovaCrypt">
         <param name="android-package" value="com.scg.crypto.CordovaCrypt" />
-        <param name="android-package" value="com.scottyb.aescrypt.AESCrypt" />
       </feature>
     </config-file>
-    <source-file src="src/android/AESCrypt/AESCrypt.java" target-dir="src/com/scottyab" />
+    <source-file src="src/android/AESCrypt/AESCrypt.java" target-dir="src/com/scottyab/aescrypt" />
     <source-file src="src/android/CordovaCrypt.java" target-dir="src/com/scg/crypto" />
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.BLUETOOTH"/>
@@ -36,6 +35,13 @@
     </config-file>
     <header-file src="src/ios/CordovaCrypt.h" />
     <source-file src="src/ios/CordovaCrypt.m" />
-    <framework src="CommonCrypto.framework" />
+    <header-file src="src/ios/AESCrypt/AESCrypt.h" />
+    <source-file src="src/ios/AESCrypt/AESCrypt.m" />
+    <header-file src="src/ios/AESCrypt/NSData+Base64.h" />
+    <source-file src="src/ios/AESCrypt/NSData+Base64.m" />
+    <header-file src="src/ios/AESCrypt/NSData+CommonCrypto.h" />
+    <source-file src="src/ios/AESCrypt/NSData+CommonCrypto.m" />
+    <header-file src="src/ios/AESCrypt/NSString+Base64.h" />
+    <source-file src="src/ios/AESCrypt/NSString+Base64.m" />
   </platform>
 </plugin>

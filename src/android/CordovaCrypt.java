@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.os.ParcelUuid;
 import android.os.Build;
 import android.util.Base64;
+import android.util.Log;
 
 import android.app.Activity;
 
@@ -25,14 +26,27 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.scottyab.aescrypt;
+import com.scottyab.aescrypt.AESCrypt;
+import java.security.GeneralSecurityException;
 
 public class CordovaCrypt extends CordovaPlugin
 {
+  private static final String TAG = "SCG";
   //Argument Keys
+  private final String keyError = "error";
   private final String keyMessage = "message";
-  private final String keyPublic = "privatekey";
-  private final String keyPrivate = "publickey";
+  private final String keyPrivate = "privatekey";
+  private final String keyPublic = "publickey";
+
+  private final String errorParams = "params";
+  private final String errorEncrypt = "encrypt";
+  private final String errorDecrypt = "decrypt";
+  private final String errorMessage = "Missing parameter message";
+  private final String errorPrivate = "Missing parameter privatekey";
+  private final String errorPublic = "Missing parameter publickey";
+
+  //enable/disable logging
+  public static boolean DEBUG_LOG_ENABLED = true;
 
   @Override
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -52,34 +66,82 @@ public class CordovaCrypt extends CordovaPlugin
 
   public void encryptAction(JSONArray args, CallbackContext callbackContext)
   {
+    JSONObject returnObj = new JSONObject();
     JSONObject obj = getArgsObject(args);
     String message = getString(obj);
     String privatekey = getAESPrivateKey(obj);
 
-    JSONObject returnObj = new JSONObject();
-    String encryptedMsg = AESCrypt.encrypt(privatekey, message);
+    log("encryptAction obj: " + obj.toString() + "\n message: " + message + " key: " + privatekey);
+    if (message == null) {
+      addProperty(returnObj, keyError, errorParams);
+      addProperty(returnObj, keyMessage, errorMessage);
+      PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
+      pluginResult.setKeepCallback(true);
+      callbackContext.sendPluginResult(pluginResult);
+    }
+    if (privatekey == null) {
+      addProperty(returnObj, keyError, errorParams);
+      addProperty(returnObj, keyMessage, errorPrivate);
+      PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
+      pluginResult.setKeepCallback(true);
+      callbackContext.sendPluginResult(pluginResult);
+    }
 
-    addProperty(returnObj, keyMessage, encryptedMsg);
+    try {
+      String encryptedMsg = AESCrypt.encrypt(privatekey, message);
 
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-    pluginResult.setKeepCallback(true);
-    callbackContext.sendPluginResult(pluginResult);
+      addProperty(returnObj, keyMessage, encryptedMsg);
+
+      PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+      pluginResult.setKeepCallback(true);
+      callbackContext.sendPluginResult(pluginResult);
+    }catch (GeneralSecurityException e){
+      addProperty(returnObj, keyError, errorEncrypt);
+      addProperty(returnObj, keyMessage, e.getMessage());
+      PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
+      pluginResult.setKeepCallback(true);
+      callbackContext.sendPluginResult(pluginResult);
+    }
   }
 
   public void decryptAction(JSONArray args, CallbackContext callbackContext)
   {
+    JSONObject returnObj = new JSONObject();
     JSONObject obj = getArgsObject(args);
     String message = getString(obj);
     String publickey = getAESPublicKey(obj);
 
-    JSONObject returnObj = new JSONObject();
-    String decryptedMsg = AESCrypt.encrypt(publickey, message);
+    log("decryptAction obj: " + obj.toString() + "\n message: " + message + " key: " + publickey);
+    if (message == null) {
+      addProperty(returnObj, keyError, errorParams);
+      addProperty(returnObj, keyMessage, errorMessage);
+      PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
+      pluginResult.setKeepCallback(true);
+      callbackContext.sendPluginResult(pluginResult);
+    }
+    if (publickey == null) {
+      addProperty(returnObj, keyError, errorParams);
+      addProperty(returnObj, keyMessage, errorPublic);
+      PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
+      pluginResult.setKeepCallback(true);
+      callbackContext.sendPluginResult(pluginResult);
+    }
 
-    addProperty(returnObj, keyMessage, decryptedMsg);
+    try {
+      String decryptedMsg = AESCrypt.decrypt(publickey, message);
 
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-    pluginResult.setKeepCallback(true);
-    callbackContext.sendPluginResult(pluginResult);
+      addProperty(returnObj, keyMessage, decryptedMsg);
+
+      PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+      pluginResult.setKeepCallback(true);
+      callbackContext.sendPluginResult(pluginResult);
+    }catch (GeneralSecurityException e){
+      addProperty(returnObj, keyError, errorDecrypt);
+      addProperty(returnObj, keyMessage, e.getMessage());
+      PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
+      pluginResult.setKeepCallback(true);
+      callbackContext.sendPluginResult(pluginResult);
+    }
   }
 
   // Private methods
@@ -133,5 +195,12 @@ public class CordovaCrypt extends CordovaPlugin
     //Get the address string from arguments
     String address = obj.optString(keyPrivate, null);
     return address;
+  }
+
+
+
+  private static void log(String what) {
+    if (DEBUG_LOG_ENABLED)
+      Log.d(TAG, what);
   }
 }
