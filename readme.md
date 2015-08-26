@@ -1,3 +1,3 @@
-Cyrptography Cordova Plugin
+Cryptography Cordova Plugin
 
 ====================
