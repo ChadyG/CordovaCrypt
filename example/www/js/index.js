@@ -19,25 +19,14 @@
 
 var AESCrypt;
 
+var jqmReady = $.Deferred();
+var pgReady = $.Deferred();
 
 var app = {
     // Application Constructor
-    initialize: function() {
+    initialize: function(callback) {
+        this.callback = callback;
         this.bindEvents();
-        $('#encode').click(function(e){
-          crypto.encrypt(function(args){
-              $('#output').html(args.message);
-            },
-            function(args){},
-            $('#inMessage').val(), $('#inPrivate').val());
-        })
-        $('#decode').click(function(e){
-          crypto.decrypt(function(args){
-              $('#output').html(args.message);
-            },
-            function(args){},
-            $('#inMessage').val(), $('#inPublic').val())
-        })
     },
     // Bind Event Listeners
     //
@@ -51,6 +40,7 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
+        pgReady.resolve();
         app.receivedEvent('deviceready');
     },
     // Update DOM on a Received Event
@@ -66,4 +56,42 @@ var app = {
     }
 };
 
-app.initialize();
+$(document).on("pagecreate", function()
+{
+  //Resolve jQuery Mobile
+  jqmReady.resolve();
+  $(document).off("pagecreate");
+});
+
+$.when(jqmReady, pgReady).then(function()
+{
+  //When PhoneGap and jQuery Mobile are resolved, start the app
+  if (app.callback !== null)
+  {
+    app.callback();
+  }
+});
+
+app.initialize(function() {
+  console.log('initialize:');
+  $('#encode').on('vclick', function(){
+    AESCrypt.encrypt(function(args){
+        $('#output').html(args.message);
+      },
+      function(args){},
+      {
+        message: $('#inMessage').val(),
+        privatekey: $('#inPrivate').val()
+      });
+  })
+  $('#decode').on('vclick', function(){
+    AESCrypt.decrypt(function(args){
+        $('#output').html(args.message);
+      },
+      function(args){},
+      {
+        message: $('#inMessage').val(),
+        publickey: $('#inPublic').val()
+      });
+  })
+});
