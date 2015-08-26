@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Crypto Example</title>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.5.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/pure-min.css" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js"></script>
+  </head>
+  <body>
+    <div id="home" data-role="page">
+      <div data-role="content">
+        <div class="ui-field-contain">
+          <label for="inMessage">Message:</label>
+          <input type="text" id="inMessage" placeholder="Message to encode/decode" value="">
+        </div>
+        <div class="ui-field-contain">
+          <label for="inPublic">Public Key:</label>
+          <input type="text" id="inPublic" placeholder="Public Key" value="">
+        </div>
+        <div class="ui-field-contain">
+          <label for="inPrivate">Private Key:</label>
+          <input type="text" id="inPrivate" placeholder="Private Key" value="">
+        </div>
+        <button id="encode" class="ui-btn ui-btn-inline">Encode</button>
+        <button id="decode" class="ui-btn ui-btn-inline">Decode</button>
+        <pre id="output"></pre>
+      </div>
+    </div>
+  </body>
+</html>

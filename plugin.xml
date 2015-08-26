@@ -33,4 +33,4 @@
     <source-file src="src/ios/CordovaCrypt.m" />
     <framework src="CommonCrypto.framework" />
   </platform>
-</widget>
+</plugin>
