@@ -1,4 +1,4 @@
-package com.randdusing.bluetoothle;
+package com.scg.crypto;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
