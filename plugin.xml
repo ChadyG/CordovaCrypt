@@ -12,7 +12,7 @@
         <param name="android-package" value="com.scg.crypt.CordovaCrypt" />
       </feature>
     </config-file>
-    <source-file src="src/android/BluetoothLePlugin.java" target-dir="src/com/scg" />
+    <source-file src="src/android/CordovaCrypt.java" target-dir="src/com/scg" />
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.BLUETOOTH"/>
       <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
