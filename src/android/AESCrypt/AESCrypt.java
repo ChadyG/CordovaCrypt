@@ -86,6 +86,38 @@ public final class AESCrypt {
 
 
     /**
+     * Encrypt and encode message using 256-bit AES with key provided.
+     *
+     *
+     * @param key
+     * @param message the thing you want to encrypt assumed String UTF-8
+     * @return Base64 encoded CipherText
+     * @throws GeneralSecurityException if problems occur during encryption
+     */
+    public static String encryptKey(final String key, String message)
+            throws GeneralSecurityException {
+
+        try {
+            byte[] bytes = key.getBytes("UTF-8");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(bytes, "AES");
+
+            log("message", message);
+
+            byte[] cipherText = encrypt(secretKeySpec, ivBytes, message.getBytes(CHARSET));
+
+            //NO_WRAP is important as was getting \n at the end
+            String encoded = Base64.encodeToString(cipherText, Base64.NO_WRAP);
+            log("Base64.NO_WRAP", encoded);
+            return encoded;
+        } catch (UnsupportedEncodingException e) {
+            if (DEBUG_LOG_ENABLED)
+                Log.e(TAG, "UnsupportedEncodingException ", e);
+            throw new GeneralSecurityException(e);
+        }
+    }
+
+
+    /**
      * More flexible AES encrypt that doesn't encode
      * @param key AES key typically 128, 192 or 256 bit
      * @param iv Initiation Vector
@@ -125,6 +157,42 @@ public final class AESCrypt {
             log("decodedCipherText", decodedCipherText);
 
             byte[] decryptedBytes = decrypt(key, ivBytes, decodedCipherText);
+
+            log("decryptedBytes", decryptedBytes);
+            String message = new String(decryptedBytes, CHARSET);
+            log("message", message);
+
+
+            return message;
+        } catch (UnsupportedEncodingException e) {
+            if (DEBUG_LOG_ENABLED)
+                Log.e(TAG, "UnsupportedEncodingException ", e);
+
+            throw new GeneralSecurityException(e);
+        }
+    }
+
+
+    /**
+     * Decrypt and decode ciphertext using 256-bit AES with key provided
+     *
+     * @param key
+     * @param base64EncodedCipherText the encrpyted message encoded with base64
+     * @return message in Plain text (String UTF-8)
+     * @throws GeneralSecurityException if there's an issue decrypting
+     */
+    public static String decryptKey(final String key, String base64EncodedCipherText)
+            throws GeneralSecurityException {
+
+        try {
+            byte[] bytes = key.getBytes("UTF-8");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(bytes, "AES");
+
+            log("base64EncodedCipherText", base64EncodedCipherText);
+            byte[] decodedCipherText = Base64.decode(base64EncodedCipherText, Base64.NO_WRAP);
+            log("decodedCipherText", decodedCipherText);
+
+            byte[] decryptedBytes = decrypt(secretKeySpec, ivBytes, decodedCipherText);
 
             log("decryptedBytes", decryptedBytes);
             String message = new String(decryptedBytes, CHARSET);

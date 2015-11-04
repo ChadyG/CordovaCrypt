@@ -6,8 +6,8 @@
   <author email="chad.godsey@systematicgroup.com" href="http://systematicgroup.com">
     Chad Godsey
   </author>
-  <js-module src="www/crypto.js" name="AESCrypt">
-    <clobbers target="window.AESCrypt" />
+  <js-module src="www/crypto.js" name="CDVCrypt">
+    <clobbers target="window.CDVCrypt" />
   </js-module>
   <platform name="android">
     <config-file target="res/xml/config.xml" parent="/*">
@@ -35,6 +35,8 @@
     </config-file>
     <header-file src="src/ios/CordovaCrypt.h" />
     <source-file src="src/ios/CordovaCrypt.m" />
+    <header-file src="src/ios/RSA/RSA.h" />
+    <header-file src="src/ios/RSA/RSA.m" />
     <header-file src="src/ios/AESCrypt/AESCrypt.h" />
     <source-file src="src/ios/AESCrypt/AESCrypt.m" />
     <header-file src="src/ios/AESCrypt/NSData+Base64.h" />

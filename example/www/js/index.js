@@ -17,7 +17,7 @@
  * under the License.
  */
 
-var AESCrypt;
+var CDVCrypt;
 
 var jqmReady = $.Deferred();
 var pgReady = $.Deferred();
@@ -74,24 +74,60 @@ $.when(jqmReady, pgReady).then(function()
 
 app.initialize(function() {
   console.log('initialize:');
+  CDVCrypt.initialize(function(args){
+      $('#output').html("Initialized");
+      CDVCrypt.getPublicKey(function(args){
+          console.log(args);
+          $('#inPublic').val(args.publickey);
+        },
+        function(args){},
+        {});
+    },
+    function(args){},
+    {});
+  $('#inToken').on('change', function(){
+    CDVCrypt.setToken(function(args){
+        $('#output').html("token updated");
+      },
+      function(args){},
+      {
+        token: $('#inToken').val()
+      });
+  })
   $('#encode').on('vclick', function(){
-    AESCrypt.encrypt(function(args){
+    CDVCrypt.encrypt(function(args){
         $('#output').html(args.message);
       },
       function(args){},
       {
-        message: $('#inMessage').val(),
-        privatekey: $('#inPrivate').val()
+        message: $('#inMessage').val()
       });
   })
   $('#decode').on('vclick', function(){
-    AESCrypt.decrypt(function(args){
+    CDVCrypt.decrypt(function(args){
         $('#output').html(args.message);
       },
       function(args){},
       {
-        message: $('#inMessage').val(),
-        publickey: $('#inPublic').val()
+        message: $('#inMessage').val()
+      });
+  })
+  $('#encodersa').on('vclick', function(){
+    CDVCrypt.encryptPublic(function(args){
+        $('#output').html(args.message);
+      },
+      function(args){},
+      {
+        message: $('#inMessage').val()
+      });
+  })
+  $('#decodersa').on('vclick', function(){
+    CDVCrypt.decryptPrivate(function(args){
+        $('#output').html(args.message);
+      },
+      function(args){},
+      {
+        message: $('#inMessage').val()
       });
   })
 });

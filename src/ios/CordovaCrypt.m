@@ -90,7 +90,7 @@ NSString *const statusTokenSet = @"set";
 
 // RSA
 
-- (void)encryptPrivate:(CDVInvokedUrlCommand*)command
+- (void)encryptPublic:(CDVInvokedUrlCommand*)command
 {
   NSDictionary *obj = [self getArgsObject:command.arguments];
   NSString *message = [self getMessage:obj];
@@ -104,7 +104,7 @@ NSString *const statusTokenSet = @"set";
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (void)decryptPublic:(CDVInvokedUrlCommand*)command
+- (void)decryptPrivate:(CDVInvokedUrlCommand*)command
 {
   NSDictionary *obj = [self getArgsObject:command.arguments];
   NSString *message = [self getMessage:obj];

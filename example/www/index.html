@@ -21,15 +21,17 @@
           <input type="text" id="inMessage" placeholder="Message to encode/decode" value="">
         </div>
         <div class="ui-field-contain">
+          <label for="inToken">AES Token:</label>
+          <input type="text" id="inToken" placeholder="AES Token" value="">
+        </div>
+        <div class="ui-field-contain">
           <label for="inPublic">Public Key:</label>
           <input type="text" id="inPublic" placeholder="Public Key" value="">
         </div>
-        <div class="ui-field-contain">
-          <label for="inPrivate">Private Key:</label>
-          <input type="text" id="inPrivate" placeholder="Private Key" value="">
-        </div>
-        <button id="encode" class="ui-btn ui-btn-inline">Encode</button>
-        <button id="decode" class="ui-btn ui-btn-inline">Decode</button>
+        <button id="encode" class="ui-btn ui-btn-inline">EncodeAES</button>
+        <button id="decode" class="ui-btn ui-btn-inline">DecodeAES</button>
+        <button id="encodersa" class="ui-btn ui-btn-inline">EncodeRSA</button>
+        <button id="decodersa" class="ui-btn ui-btn-inline">DecodeRSA</button>
         <pre id="output"></pre>
       </div>
     </div>
