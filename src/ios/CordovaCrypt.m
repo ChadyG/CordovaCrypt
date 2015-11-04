@@ -1,26 +1,74 @@
 #import "CordovaCrypt.h"
 #import "AESCrypt.h"
+#import "RSA.h"
 
 //Plugin Name
 NSString *const pluginName = @"CordovaCrypt";
 
 //Object Keys
 NSString *const keyMessage = @"message";
-NSString *const keyValue = @"value";
+NSString *const keyToken = @"token";
 NSString *const keyPublic = @"publickey";
 NSString *const keyPrivate = @"privatekey";
+NSString *const keyIsInitialized = @"isInitialized";
+
+//Status Types
+NSString *const statusInitialized = @"initialized";
+NSString *const statusTokenSet = @"set";
+
+
+@interface CordovaCrypt ()
+{
+  NSString *token;
+  RSA *rsa;
+}
+@end
+
 
 @implementation CordovaCrypt
 
+
+- (void)initialize:(CDVInvokedUrlCommand*)command
+{
+  NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys: statusInitialized, keyIsInitialized, nil];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnObj];
+
+  rsa = [RSA sharedInstance];
+  [rsa setIdentifierForPublicKey:@"com.scg.publicKey"
+                      privateKey:@"com.scg.privateKey"
+                 serverPublicKey:@"com.scg.serverPublicKey"];
+
+  [rsa generateKeyPairRSACompleteBlock:^{
+    //NSLog(@"Key generated and public key shown");
+  }];
+
+
+  [pluginResult setKeepCallbackAsBool:true];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+// AES
+
+- (void)setToken:(CDVInvokedUrlCommand*)command
+{
+  NSDictionary *obj = [self getArgsObject:command.arguments];
+  NSString *message = [self getMessage:obj];
+  token = [self getToken:obj];
+
+  NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys: statusTokenSet, keyToken, nil];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnObj];
+
+  [pluginResult setKeepCallbackAsBool:true];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
 
 - (void)encrypt:(CDVInvokedUrlCommand*)command
 {
   NSDictionary *obj = [self getArgsObject:command.arguments];
   NSString *message = [self getMessage:obj];
-  NSString *privatekey = [self getPrivateKey:obj];
 
   NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
-                             [AESCrypt encrypt:message password:privatekey], keyMessage,
+                             [AESCrypt encrypt:message key:token], keyMessage,
                              nil];
   CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK  messageAsDictionary:returnObj];
   [pluginResult setKeepCallbackAsBool:true];
@@ -31,12 +79,50 @@ NSString *const keyPrivate = @"privatekey";
 {
   NSDictionary *obj = [self getArgsObject:command.arguments];
   NSString *message = [self getMessage:obj];
-  NSString *publickey = [self getPublicKey:obj];
 
-    NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
-                               [AESCrypt decrypt:message password:publickey], keyMessage,
-                               nil];
+  NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
+                              [AESCrypt decrypt:message key:token], keyMessage,
+                              nil];
   CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK  messageAsDictionary:returnObj];
+  [pluginResult setKeepCallbackAsBool:true];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+// RSA
+
+- (void)encryptPrivate:(CDVInvokedUrlCommand*)command
+{
+  NSDictionary *obj = [self getArgsObject:command.arguments];
+  NSString *message = [self getMessage:obj];
+
+  NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
+                             [rsa encryptUsingServerPublicKeyWithData:[message dataUsingEncoding:NSUTF8StringEncoding]], keyMessage,
+                             nil];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnObj];
+
+  [pluginResult setKeepCallbackAsBool:true];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)decryptPublic:(CDVInvokedUrlCommand*)command
+{
+  NSDictionary *obj = [self getArgsObject:command.arguments];
+  NSString *message = [self getMessage:obj];
+
+  NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
+                             [rsa decryptUsingPrivateKeyWithData:[[NSData alloc] initWithBase64EncodedString:message options:0]], keyMessage,
+                             nil];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnObj];
+
+  [pluginResult setKeepCallbackAsBool:true];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)getPublicKey:(CDVInvokedUrlCommand*)command
+{
+  NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys: [rsa getServerPublicKey], keyPublic, nil];
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnObj];
+
   [pluginResult setKeepCallbackAsBool:true];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -64,41 +150,43 @@ NSString *const keyPrivate = @"privatekey";
   return (NSDictionary *)[args objectAtIndex:0];
 }
 
--(NSData*) getValue:(NSDictionary *) obj
-{
-  NSString* string = [obj valueForKey:keyValue];
+// Reference
 
-  if (string == nil)
-  {
-    return nil;
-  }
+// -(NSData*) getValue:(NSDictionary *) obj
+// {
+//   NSString* string = [obj valueForKey:keyValue];
 
-  if (![string isKindOfClass:[NSString class]])
-  {
-    return nil;
-  }
+//   if (string == nil)
+//   {
+//     return nil;
+//   }
 
-  NSData *data = [[NSData alloc] initWithBase64EncodedString:string options:0];
+//   if (![string isKindOfClass:[NSString class]])
+//   {
+//     return nil;
+//   }
 
-  if (data == nil || data.length == 0)
-  {
-    return nil;
-  }
+//   NSData *data = [[NSData alloc] initWithBase64EncodedString:string options:0];
 
-  return data;
-}
+//   if (data == nil || data.length == 0)
+//   {
+//     return nil;
+//   }
 
--(void) addValue:(NSData *) bytes toDictionary:(NSMutableDictionary *) obj
-{
-  NSString *string = [bytes base64EncodedStringWithOptions:0];
+//   return data;
+// }
 
-  if (string == nil || string.length == 0)
-  {
-    return;
-  }
+// -(void) addValue:(NSData *) bytes toDictionary:(NSMutableDictionary *) obj
+// {
+//   NSString *string = [bytes base64EncodedStringWithOptions:0];
 
-  [obj setValue:string forKey:keyValue];
-}
+//   if (string == nil || string.length == 0)
+//   {
+//     return;
+//   }
+
+//   [obj setValue:string forKey:keyValue];
+// }
 
 
 -(NSString*) getMessage:(NSDictionary *)obj
@@ -120,36 +208,53 @@ NSString *const keyPrivate = @"privatekey";
 
 -(NSString*) getPrivateKey:(NSDictionary *)obj
 {
-  NSString* messageString = [obj valueForKey:keyPrivate];
+  NSString* keyString = [obj valueForKey:keyPrivate];
 
-  if (messageString == nil)
+  if (keyString == nil)
   {
     return nil;
   }
 
-  if (![messageString isKindOfClass:[NSString class]])
+  if (![keyString isKindOfClass:[NSString class]])
   {
     return nil;
   }
 
-  return messageString;
+  return keyString;
 }
 
 -(NSString*) getPublicKey:(NSDictionary *)obj
 {
-  NSString* messageString = [obj valueForKey:keyPublic];
+  NSString* keyString = [obj valueForKey:keyPublic];
 
-  if (messageString == nil)
+  if (keyString == nil)
   {
     return nil;
   }
 
-  if (![messageString isKindOfClass:[NSString class]])
+  if (![keyString isKindOfClass:[NSString class]])
   {
     return nil;
   }
 
-  return messageString;
+  return keyString;
+}
+
+-(NSString*) getToken:(NSDictionary *)obj
+{
+  NSString* tokenString = [obj valueForKey:keyToken];
+
+  if (tokenString == nil)
+  {
+    return nil;
+  }
+
+  if (![tokenString isKindOfClass:[NSString class]])
+  {
+    return nil;
+  }
+
+  return tokenString;
 }
 
 @end

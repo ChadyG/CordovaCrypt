@@ -47,4 +47,17 @@
   return [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
 }
 
+
++ (NSString *)encrypt:(NSString *)message key:(NSString *)key {
+  NSData *encryptedData = [[message dataUsingEncoding:NSUTF8StringEncoding] AES256EncryptedDataUsingKey:[key dataUsingEncoding:NSUTF8StringEncoding] error:nil];
+  NSString *base64EncodedString = [NSString base64StringFromData:encryptedData length:[encryptedData length]];
+  return base64EncodedString;
+}
+
++ (NSString *)decrypt:(NSString *)base64EncodedString key:(NSString *)key {
+  NSData *encryptedData = [NSData base64DataFromString:base64EncodedString];
+  NSData *decryptedData = [encryptedData decryptedAES256DataUsingKey:[key dataUsingEncoding:NSUTF8StringEncoding] error:nil];
+  return [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
+}
+
 @end
