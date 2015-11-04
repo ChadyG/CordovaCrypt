@@ -6,8 +6,8 @@ var AESCrypt = {
   encrypt: function(successCallback, errorCallback, params) {
     cordova.exec(successCallback, errorCallback, cryptoName, "encrypt", [params]);
   },
-  decyrpt: function(successCallback, errorCallback, params) {
-    cordova.exec(successCallback, errorCallback, cryptoName, "decyrpt", [params]);
+  decrypt: function(successCallback, errorCallback, params) {
+    cordova.exec(successCallback, errorCallback, cryptoName, "decrypt", [params]);
   }
 }
 module.exports = AESCrypt;

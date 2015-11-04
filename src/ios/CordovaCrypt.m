@@ -1,15 +1,16 @@
 #import "CordovaCrypt.h"
-#import "AESCrypt/AESCrypt.h"
+#import "AESCrypt.h"
 
 //Plugin Name
 NSString *const pluginName = @"CordovaCrypt";
 
 //Object Keys
 NSString *const keyMessage = @"message";
-NSString *const keyPublic = @"privatekey";
-NSString *const keyPrivate = @"publickey";
+NSString *const keyValue = @"value";
+NSString *const keyPublic = @"publickey";
+NSString *const keyPrivate = @"privatekey";
 
-@implemenation CordovaCrypt
+@implementation CordovaCrypt
 
 
 - (void)encrypt:(CDVInvokedUrlCommand*)command
@@ -18,9 +19,11 @@ NSString *const keyPrivate = @"publickey";
   NSString *message = [self getMessage:obj];
   NSString *privatekey = [self getPrivateKey:obj];
 
-  NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys: keyMessage, [AESCrypt encrypt message, password: privatekey], nil];
-  CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:resultWithStatus:CDVCommandStatus_OK  messageAsDictionary:returnObj];
-  [pluginResult setKeepCallbackAsBool:false];
+  NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
+                             [AESCrypt encrypt:message password:privatekey], keyMessage,
+                             nil];
+  CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK  messageAsDictionary:returnObj];
+  [pluginResult setKeepCallbackAsBool:true];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
@@ -30,9 +33,11 @@ NSString *const keyPrivate = @"publickey";
   NSString *message = [self getMessage:obj];
   NSString *publickey = [self getPublicKey:obj];
 
-  NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys: keyMessage, [AESCrypt decrypt message, password: publickey], nil];
-  CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:resultWithStatus:CDVCommandStatus_OK  messageAsDictionary:returnObj];
-  [pluginResult setKeepCallbackAsBool:false];
+    NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
+                               [AESCrypt decrypt:message password:publickey], keyMessage,
+                               nil];
+  CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK  messageAsDictionary:returnObj];
+  [pluginResult setKeepCallbackAsBool:true];
   [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
@@ -146,3 +151,5 @@ NSString *const keyPrivate = @"publickey";
 
   return messageString;
 }
+
+@end
