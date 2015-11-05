@@ -36,7 +36,7 @@
     <header-file src="src/ios/CordovaCrypt.h" />
     <source-file src="src/ios/CordovaCrypt.m" />
     <header-file src="src/ios/RSA/RSA.h" />
-    <header-file src="src/ios/RSA/RSA.m" />
+    <source-file src="src/ios/RSA/RSA.m" />
     <header-file src="src/ios/AESCrypt/AESCrypt.h" />
     <source-file src="src/ios/AESCrypt/AESCrypt.m" />
     <header-file src="src/ios/AESCrypt/NSData+Base64.h" />
