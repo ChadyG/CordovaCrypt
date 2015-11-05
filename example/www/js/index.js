@@ -96,7 +96,8 @@ app.initialize(function() {
   })
   $('#encode').on('vclick', function(){
     CDVCrypt.encrypt(function(args){
-        $('#output').html(args.message);
+        $('#output').html("Encoded: </br>"+args.message);
+        $('#inEncoded').val(args.message);
       },
       function(args){},
       {
@@ -105,16 +106,17 @@ app.initialize(function() {
   })
   $('#decode').on('vclick', function(){
     CDVCrypt.decrypt(function(args){
-        $('#output').html(args.message);
+        $('#output').html("Decoded: </br>"+args.message);
       },
       function(args){},
       {
-        message: $('#inMessage').val()
+        message: $('#inEncoded').val()
       });
   })
   $('#encodersa').on('vclick', function(){
     CDVCrypt.encryptPublic(function(args){
-        $('#output').html(args.message);
+        $('#output').html("Encoded: </br>"+args.message);
+        $('#inEncoded').val(args.message);
       },
       function(args){},
       {
@@ -123,11 +125,11 @@ app.initialize(function() {
   })
   $('#decodersa').on('vclick', function(){
     CDVCrypt.decryptPrivate(function(args){
-        $('#output').html(args.message);
+        $('#output').html("Decoded: </br>"+args.message);
       },
       function(args){},
       {
-        message: $('#inMessage').val()
+        message: $('#inEncoded').val()
       });
   })
 });

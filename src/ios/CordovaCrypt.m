@@ -96,7 +96,7 @@ NSString *const statusTokenSet = @"set";
   NSString *message = [self getMessage:obj];
 
   NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
-                             [rsa encryptUsingServerPublicKeyWithData:[message dataUsingEncoding:NSUTF8StringEncoding]], keyMessage,
+                             [rsa encryptUsingPublicKeyWithData:[message dataUsingEncoding:NSUTF8StringEncoding]], keyMessage,
                              nil];
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnObj];
 
@@ -110,7 +110,7 @@ NSString *const statusTokenSet = @"set";
   NSString *message = [self getMessage:obj];
 
   NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
-                             [rsa decryptUsingPrivateKeyWithData:[[NSData alloc] initWithBase64EncodedString:message options:0]], keyMessage,
+                             [rsa decryptUsingPrivateKeyWithData:[NSData dataFromBase64String:message]], keyMessage,
                              nil];
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnObj];
 
@@ -120,7 +120,7 @@ NSString *const statusTokenSet = @"set";
 
 - (void)getPublicKey:(CDVInvokedUrlCommand*)command
 {
-  NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys: [rsa getServerPublicKey], keyPublic, nil];
+  NSDictionary* returnObj = [NSDictionary dictionaryWithObjectsAndKeys: [rsa getPublicKeyAsBase64], keyPublic, nil];
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnObj];
 
   [pluginResult setKeepCallbackAsBool:true];
@@ -223,7 +223,7 @@ NSString *const statusTokenSet = @"set";
   return keyString;
 }
 
--(NSString*) getPublicKey:(NSDictionary *)obj
+-(NSString*) getPubKey:(NSDictionary *)obj
 {
   NSString* keyString = [obj valueForKey:keyPublic];
 

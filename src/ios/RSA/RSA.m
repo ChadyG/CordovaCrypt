@@ -32,20 +32,20 @@
 #import "RSA.h"
 
 #if DEBUG
-    #define LOGGING_FACILITY(X, Y)	\
+    #define LOGGING_FACILITY(X, Y)  \
     NSAssert(X, Y);
 
-    #define LOGGING_FACILITY1(X, Y, Z)	\
+    #define LOGGING_FACILITY1(X, Y, Z)  \
     NSAssert1(X, Y, Z);
 #else
-    #define LOGGING_FACILITY(X, Y)	\
-        if (!(X)) {			\
-        NSLog(Y);		\
+    #define LOGGING_FACILITY(X, Y)  \
+        if (!(X)) {         \
+        NSLog(Y);       \
     }
 
-    #define LOGGING_FACILITY1(X, Y, Z)	\
-        if (!(X)) {				\
-        NSLog(Y, Z);		\
+    #define LOGGING_FACILITY1(X, Y, Z)  \
+        if (!(X)) {             \
+        NSLog(Y, Z);        \
     }
 #endif
 
@@ -54,7 +54,7 @@ const size_t kSecAttrKeySizeInBitsLength = 2024;
 @interface RSA (){
 @private
     NSData * publicTag;
-	NSData * privateTag;
+    NSData * privateTag;
     NSData * serverPublicTag;
     NSOperationQueue * cryptoQueue;
     GenerateSuccessBlock success;
@@ -277,79 +277,79 @@ size_t encodeLength(unsigned char * buf, size_t length) {
 
 - (void)generateKeyPairRSA {
     OSStatus sanityCheck = noErr;
-	publicKeyRef = NULL;
-	privateKeyRef = NULL;
-	
-	// First delete current keys.
-	[self deleteAsymmetricKeys];
-	
-	// Container dictionaries.
-	NSMutableDictionary * privateKeyAttr = [NSMutableDictionary dictionaryWithCapacity:0];
-	NSMutableDictionary * publicKeyAttr = [NSMutableDictionary dictionaryWithCapacity:0];
-	NSMutableDictionary * keyPairAttr = [NSMutableDictionary dictionaryWithCapacity:0];
-	
-	// Set top level dictionary for the keypair.
-	[keyPairAttr setObject:(__bridge id)kSecAttrKeyTypeRSA forKey:(__bridge id)kSecAttrKeyType];
-	[keyPairAttr setObject:[NSNumber numberWithUnsignedInteger:kSecAttrKeySizeInBitsLength] forKey:(__bridge id)kSecAttrKeySizeInBits];
-	
-	// Set the private key dictionary.
-	[privateKeyAttr setObject:[NSNumber numberWithBool:YES] forKey:(__bridge id)kSecAttrIsPermanent];
-	[privateKeyAttr setObject:privateTag forKey:(__bridge id)kSecAttrApplicationTag];
-	// See SecKey.h to set other flag values.
-	
-	// Set the public key dictionary.
-	[publicKeyAttr setObject:[NSNumber numberWithBool:YES] forKey:(__bridge id)kSecAttrIsPermanent];
-	[publicKeyAttr setObject:publicTag forKey:(__bridge id)kSecAttrApplicationTag];
-	// See SecKey.h to set other flag values.
-	
-	// Set attributes to top level dictionary.
-	[keyPairAttr setObject:privateKeyAttr forKey:(__bridge id)kSecPrivateKeyAttrs];
-	[keyPairAttr setObject:publicKeyAttr forKey:(__bridge id)kSecPublicKeyAttrs];
-	
-	// SecKeyGeneratePair returns the SecKeyRefs just for educational purposes.
-	sanityCheck = SecKeyGeneratePair((__bridge CFDictionaryRef)keyPairAttr, &publicKeyRef, &privateKeyRef);
-	LOGGING_FACILITY( sanityCheck == noErr && publicKeyRef != NULL && privateKeyRef != NULL, @"Something really bad went wrong with generating the key pair." );
+    publicKeyRef = NULL;
+    privateKeyRef = NULL;
+    
+    // First delete current keys.
+    [self deleteAsymmetricKeys];
+    
+    // Container dictionaries.
+    NSMutableDictionary * privateKeyAttr = [NSMutableDictionary dictionaryWithCapacity:0];
+    NSMutableDictionary * publicKeyAttr = [NSMutableDictionary dictionaryWithCapacity:0];
+    NSMutableDictionary * keyPairAttr = [NSMutableDictionary dictionaryWithCapacity:0];
+    
+    // Set top level dictionary for the keypair.
+    [keyPairAttr setObject:(__bridge id)kSecAttrKeyTypeRSA forKey:(__bridge id)kSecAttrKeyType];
+    [keyPairAttr setObject:[NSNumber numberWithUnsignedInteger:kSecAttrKeySizeInBitsLength] forKey:(__bridge id)kSecAttrKeySizeInBits];
+    
+    // Set the private key dictionary.
+    [privateKeyAttr setObject:[NSNumber numberWithBool:YES] forKey:(__bridge id)kSecAttrIsPermanent];
+    [privateKeyAttr setObject:privateTag forKey:(__bridge id)kSecAttrApplicationTag];
+    // See SecKey.h to set other flag values.
+    
+    // Set the public key dictionary.
+    [publicKeyAttr setObject:[NSNumber numberWithBool:YES] forKey:(__bridge id)kSecAttrIsPermanent];
+    [publicKeyAttr setObject:publicTag forKey:(__bridge id)kSecAttrApplicationTag];
+    // See SecKey.h to set other flag values.
+    
+    // Set attributes to top level dictionary.
+    [keyPairAttr setObject:privateKeyAttr forKey:(__bridge id)kSecPrivateKeyAttrs];
+    [keyPairAttr setObject:publicKeyAttr forKey:(__bridge id)kSecPublicKeyAttrs];
+    
+    // SecKeyGeneratePair returns the SecKeyRefs just for educational purposes.
+    sanityCheck = SecKeyGeneratePair((__bridge CFDictionaryRef)keyPairAttr, &publicKeyRef, &privateKeyRef);
+    LOGGING_FACILITY( sanityCheck == noErr && publicKeyRef != NULL && privateKeyRef != NULL, @"Something really bad went wrong with generating the key pair." );
 }
 
 #pragma mark - Deletion
 
 - (void)deleteAsymmetricKeys {
     
-	OSStatus sanityCheck = noErr;
-	NSMutableDictionary * queryPublicKey        = [NSMutableDictionary dictionaryWithCapacity:0];
-	NSMutableDictionary * queryPrivateKey       = [NSMutableDictionary dictionaryWithCapacity:0];
-	NSMutableDictionary * queryServPublicKey    = [NSMutableDictionary dictionaryWithCapacity:0];
+    OSStatus sanityCheck = noErr;
+    NSMutableDictionary * queryPublicKey        = [NSMutableDictionary dictionaryWithCapacity:0];
+    NSMutableDictionary * queryPrivateKey       = [NSMutableDictionary dictionaryWithCapacity:0];
+    NSMutableDictionary * queryServPublicKey    = [NSMutableDictionary dictionaryWithCapacity:0];
     
-	// Set the public key query dictionary.
-	[queryPublicKey setObject:(__bridge id)kSecClassKey forKey:(__bridge id)kSecClass];
-	[queryPublicKey setObject:publicTag forKey:(__bridge id)kSecAttrApplicationTag];
-	[queryPublicKey setObject:(__bridge id)kSecAttrKeyTypeRSA forKey:(__bridge id)kSecAttrKeyType];
-	
-	// Set the private key query dictionary.
-	[queryPrivateKey setObject:(__bridge id)kSecClassKey forKey:(__bridge id)kSecClass];
-	[queryPrivateKey setObject:privateTag forKey:(__bridge id)kSecAttrApplicationTag];
-	[queryPrivateKey setObject:(__bridge id)kSecAttrKeyTypeRSA forKey:(__bridge id)kSecAttrKeyType];
+    // Set the public key query dictionary.
+    [queryPublicKey setObject:(__bridge id)kSecClassKey forKey:(__bridge id)kSecClass];
+    [queryPublicKey setObject:publicTag forKey:(__bridge id)kSecAttrApplicationTag];
+    [queryPublicKey setObject:(__bridge id)kSecAttrKeyTypeRSA forKey:(__bridge id)kSecAttrKeyType];
+    
+    // Set the private key query dictionary.
+    [queryPrivateKey setObject:(__bridge id)kSecClassKey forKey:(__bridge id)kSecClass];
+    [queryPrivateKey setObject:privateTag forKey:(__bridge id)kSecAttrApplicationTag];
+    [queryPrivateKey setObject:(__bridge id)kSecAttrKeyTypeRSA forKey:(__bridge id)kSecAttrKeyType];
     
     // Set the server public key query dictionary.
-	[queryServPublicKey setObject:(__bridge id)kSecClassKey forKey:(__bridge id)kSecClass];
-	[queryServPublicKey setObject:serverPublicTag forKey:(__bridge id)kSecAttrApplicationTag];
-	[queryServPublicKey setObject:(__bridge id)kSecAttrKeyTypeRSA forKey:(__bridge id)kSecAttrKeyType];
-	
-	// Delete the private key.
-	sanityCheck = SecItemDelete((__bridge CFDictionaryRef)queryPrivateKey);
-	LOGGING_FACILITY1( sanityCheck == noErr || sanityCheck == errSecItemNotFound, @"Error removing private key, OSStatus == %ld.", (long)sanityCheck );
-	
-	// Delete the public key.
-	sanityCheck = SecItemDelete((__bridge CFDictionaryRef)queryPublicKey);
-	LOGGING_FACILITY1( sanityCheck == noErr || sanityCheck == errSecItemNotFound, @"Error removing public key, OSStatus == %ld.", (long)sanityCheck );
+    [queryServPublicKey setObject:(__bridge id)kSecClassKey forKey:(__bridge id)kSecClass];
+    [queryServPublicKey setObject:serverPublicTag forKey:(__bridge id)kSecAttrApplicationTag];
+    [queryServPublicKey setObject:(__bridge id)kSecAttrKeyTypeRSA forKey:(__bridge id)kSecAttrKeyType];
+    
+    // Delete the private key.
+    sanityCheck = SecItemDelete((__bridge CFDictionaryRef)queryPrivateKey);
+    LOGGING_FACILITY1( sanityCheck == noErr || sanityCheck == errSecItemNotFound, @"Error removing private key, OSStatus == %ld.", (long)sanityCheck );
+    
+    // Delete the public key.
+    sanityCheck = SecItemDelete((__bridge CFDictionaryRef)queryPublicKey);
+    LOGGING_FACILITY1( sanityCheck == noErr || sanityCheck == errSecItemNotFound, @"Error removing public key, OSStatus == %ld.", (long)sanityCheck );
     
     // Delete the server public key.
-	sanityCheck = SecItemDelete((__bridge CFDictionaryRef)queryServPublicKey);
-	LOGGING_FACILITY1( sanityCheck == noErr || sanityCheck == errSecItemNotFound, @"Error removing server public key, OSStatus == %ld.", (long)sanityCheck );
+    sanityCheck = SecItemDelete((__bridge CFDictionaryRef)queryServPublicKey);
+    LOGGING_FACILITY1( sanityCheck == noErr || sanityCheck == errSecItemNotFound, @"Error removing server public key, OSStatus == %ld.", (long)sanityCheck );
 
     
-	if (publicKeyRef) CFRelease(publicKeyRef);
-	if (privateKeyRef) CFRelease(privateKeyRef);
+    if (publicKeyRef) CFRelease(publicKeyRef);
+    if (privateKeyRef) CFRelease(privateKeyRef);
     if (serverPublicRef) CFRelease(serverPublicRef);
 }
 
@@ -358,26 +358,26 @@ size_t encodeLength(unsigned char * buf, size_t length) {
 - (NSData *)readKeyBits:(NSData *)tag keyType:(CFTypeRef)keyType {
     
     OSStatus sanityCheck = noErr;
-	CFTypeRef  _publicKeyBitsReference = NULL;
-	
-	NSMutableDictionary * queryPublicKey = [NSMutableDictionary dictionaryWithCapacity:0];
+    CFTypeRef  _publicKeyBitsReference = NULL;
     
-	// Set the public key query dictionary.
-	[queryPublicKey setObject:(__bridge id)kSecClassKey forKey:(__bridge id)kSecClass];
-	[queryPublicKey setObject:tag forKey:(__bridge id)kSecAttrApplicationTag];
-	[queryPublicKey setObject:(__bridge id)keyType forKey:(__bridge id)kSecAttrKeyType];
-	[queryPublicKey setObject:[NSNumber numberWithBool:YES] forKey:(__bridge id)kSecReturnData];
+    NSMutableDictionary * queryPublicKey = [NSMutableDictionary dictionaryWithCapacity:0];
     
-	// Get the key bits.
-	sanityCheck = SecItemCopyMatching((__bridge CFDictionaryRef)queryPublicKey, (CFTypeRef *)&_publicKeyBitsReference);
+    // Set the public key query dictionary.
+    [queryPublicKey setObject:(__bridge id)kSecClassKey forKey:(__bridge id)kSecClass];
+    [queryPublicKey setObject:tag forKey:(__bridge id)kSecAttrApplicationTag];
+    [queryPublicKey setObject:(__bridge id)keyType forKey:(__bridge id)kSecAttrKeyType];
+    [queryPublicKey setObject:[NSNumber numberWithBool:YES] forKey:(__bridge id)kSecReturnData];
     
-	if (sanityCheck != noErr) {
-		_publicKeyBitsReference = NULL;
-	}
+    // Get the key bits.
+    sanityCheck = SecItemCopyMatching((__bridge CFDictionaryRef)queryPublicKey, (CFTypeRef *)&_publicKeyBitsReference);
+    
+    if (sanityCheck != noErr) {
+        _publicKeyBitsReference = NULL;
+    }
     
     publicKeyRef = (SecKeyRef)_publicKeyBitsReference;
     
-	return (__bridge NSData*)_publicKeyBitsReference;
+    return (__bridge NSData*)_publicKeyBitsReference;
 
 }
 
