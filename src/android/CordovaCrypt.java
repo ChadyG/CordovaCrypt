@@ -15,6 +15,7 @@ import android.util.Log;
 
 import android.app.Activity;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -66,37 +67,30 @@ public class CordovaCrypt extends CordovaPlugin
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
     if ("initialize".equals(action)) {
       this.initializeAction(args, callbackContext);
-      callbackContext.success();
       return true;
     }
     if ("setToken".equals(action)) {
       this.setAESTokenAction(args, callbackContext);
-      callbackContext.success();
       return true;
     }
     if ("encrypt".equals(action)) {
       this.encryptAESAction(args, callbackContext);
-      callbackContext.success();
       return true;
     }
     if ("decrypt".equals(action)) {
       this.decryptAESAction(args, callbackContext);
-      callbackContext.success();
       return true;
     }
     if ("encryptPublic".equals(action)) {
       this.encryptRSAAction(args, callbackContext);
-      callbackContext.success();
       return true;
     }
     if ("decryptPrivate".equals(action)) {
       this.decryptRSAAction(args, callbackContext);
-      callbackContext.success();
       return true;
     }
     if ("getPublicKey".equals(action)) {
       this.getRSAPublic(args, callbackContext);
-      callbackContext.success();
       return true;
     }
     return false;  // Returning false results in a "MethodNotFound" error.
@@ -275,7 +269,7 @@ public class CordovaCrypt extends CordovaPlugin
       byte[] decodedBytes = null;
       Cipher c = Cipher.getInstance("RSA");
       c.init(Cipher.DECRYPT_MODE, publicRSAKey);
-      decodedBytes = c.doFinal(message.getBytes());
+      decodedBytes = c.doFinal(Base64.decode(message, Base64.DEFAULT));
 
       addProperty(returnObj, keyMessage, new String(decodedBytes, "UTF-8"));
 
@@ -283,6 +277,12 @@ public class CordovaCrypt extends CordovaPlugin
       pluginResult.setKeepCallback(true);
       callbackContext.sendPluginResult(pluginResult);
     }catch (GeneralSecurityException e){
+      addProperty(returnObj, keyError, errorDecrypt);
+      addProperty(returnObj, keyMessage, e.getMessage());
+      PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
+      pluginResult.setKeepCallback(true);
+      callbackContext.sendPluginResult(pluginResult);
+    } catch (UnsupportedEncodingException e) {
       addProperty(returnObj, keyError, errorDecrypt);
       addProperty(returnObj, keyMessage, e.getMessage());
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
