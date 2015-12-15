@@ -29,7 +29,9 @@
 //
 
 
+#import "NSString+Base64.h"
 #import "RSA.h"
+#import "iris_app-Swift.h"
 
 #if DEBUG
     #define LOGGING_FACILITY(X, Y)  \
@@ -49,7 +51,7 @@
     }
 #endif
 
-const size_t kSecAttrKeySizeInBitsLength = 2024;
+const size_t kSecAttrKeySizeInBitsLength = 2048;
 
 @interface RSA (){
 @private
@@ -375,8 +377,6 @@ size_t encodeLength(unsigned char * buf, size_t length) {
         _publicKeyBitsReference = NULL;
     }
     
-    publicKeyRef = (SecKeyRef)_publicKeyBitsReference;
-    
     return (__bridge NSData*)_publicKeyBitsReference;
 
 }
@@ -417,7 +417,10 @@ size_t encodeLength(unsigned char * buf, size_t length) {
     
     if(resultCode != noErr)
     {
-        publicKeyRef = NULL;
+        if (tag == publicTag)
+            publicKeyRef = NULL;
+        if (tag == privateTag)
+            privateKeyRef = NULL;
     }
     
     queryPublicKey =nil;
@@ -491,7 +494,7 @@ size_t encodeLength(unsigned char * buf, size_t length) {
     
     NSMutableData *bits = [NSMutableData dataWithLength:keyBufferSize];
     OSStatus sanityCheck = SecKeyDecrypt(key,
-                                         kSecPaddingPKCS1,
+                                         kSecPaddingPKCS1,//kSecPaddingPKCS1,kSecPaddingNone,kSecPaddingOAEP
                                          (const uint8_t *) [wrappedSymmetricKey bytes],
                                          cipherBufferSize,
                                          [bits mutableBytes],
@@ -502,12 +505,19 @@ size_t encodeLength(unsigned char * buf, size_t length) {
         NSLog(@"Error: %@", [error description]);
     }
     
+#if DEBUG
     NSAssert(sanityCheck == noErr, @"Error decrypting, OSStatus == %ld.", (long)sanityCheck);
+#endif
     
     [bits setLength:keyBufferSize];
+    //c
     
-    return [[NSString alloc] initWithData:bits
+    NSString *decData = [[NSString alloc] initWithData:bits
                                  encoding:NSUTF8StringEncoding];
+    if (decData == NULL) {
+        decData = [NSString base64StringFromData:bits  length:[bits length]];
+    }
+    return decData;
 }
 
 #pragma mark - Public Key setter
@@ -570,6 +580,17 @@ size_t encodeLength(unsigned char * buf, size_t length) {
 
 
 #pragma mark - Public Key getters
+
+
+- (NSString *)getPublicKeyPEM {
+    CryptoExportImportManager *cexport = [CryptoExportImportManager alloc];
+    return [cexport exportPublicKeyToPEM:[self publicKeyBits] keyType:kSecAttrKeyTypeRSA keySize:kSecAttrKeySizeInBitsLength];
+}
+
+- (NSString *)getPublicKeyDER {
+    CryptoExportImportManager *cexport = [CryptoExportImportManager alloc];
+    return [cexport exportPublicKeyToDER:[self publicKeyBits] keyType:kSecAttrKeyTypeRSA keySize:kSecAttrKeySizeInBitsLength];
+}
 
 - (NSString *)getPublicKeyAsBase64 {
     return [[self publicKeyBits] base64EncodedStringWithOptions:0];

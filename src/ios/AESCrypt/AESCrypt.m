@@ -33,31 +33,42 @@
 #import "NSString+Base64.h"
 #import "NSData+CommonCrypto.h"
 
+
+//TODO: use NSData, NSString base64 methods
 @implementation AESCrypt
 
 + (NSString *)encrypt:(NSString *)message password:(NSString *)password {
-  NSData *encryptedData = [[message dataUsingEncoding:NSUTF8StringEncoding] AES256EncryptedDataUsingKey:[[password dataUsingEncoding:NSUTF8StringEncoding] SHA256Hash] error:nil];
-  NSString *base64EncodedString = [NSString base64StringFromData:encryptedData length:[encryptedData length]];
-  return base64EncodedString;
+    NSData *encryptedData = [[message dataUsingEncoding:NSUTF8StringEncoding] AES256EncryptedDataUsingKey:[[password dataUsingEncoding:NSUTF8StringEncoding] SHA256Hash] error:nil];
+    NSString *base64EncodedString = [NSString base64StringFromData:encryptedData length:[encryptedData length]];
+    return base64EncodedString;
 }
 
 + (NSString *)decrypt:(NSString *)base64EncodedString password:(NSString *)password {
-  NSData *encryptedData = [NSData base64DataFromString:base64EncodedString];
-  NSData *decryptedData = [encryptedData decryptedAES256DataUsingKey:[[password dataUsingEncoding:NSUTF8StringEncoding] SHA256Hash] error:nil];
-  return [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
+    NSData *encryptedData = [NSData base64DataFromString:base64EncodedString];
+    NSData *decryptedData = [encryptedData decryptedAES256DataUsingKey:[[password dataUsingEncoding:NSUTF8StringEncoding] SHA256Hash] error:nil];
+    return [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
 }
 
 
++ (NSString *)encryptData:(NSData *)data key:(NSString *)key {
+    NSData *encryptedData = [data AES256EncryptedDataUsingKey:[NSData base64DataFromString:key] error:nil];
+    NSString *base64EncodedString = [NSString base64StringFromData:encryptedData length:[encryptedData length]];
+    //NSString *base64EncodedString = [encryptedData base64EncodedDataWithOptions:0];
+    return base64EncodedString;
+}
+
 + (NSString *)encrypt:(NSString *)message key:(NSString *)key {
-  NSData *encryptedData = [[message dataUsingEncoding:NSUTF8StringEncoding] AES256EncryptedDataUsingKey:[key dataUsingEncoding:NSUTF8StringEncoding] error:nil];
-  NSString *base64EncodedString = [NSString base64StringFromData:encryptedData length:[encryptedData length]];
-  return base64EncodedString;
+    NSData *encryptedData = [[message dataUsingEncoding:NSUTF8StringEncoding] AES256EncryptedDataUsingKey:[NSData base64DataFromString:key] error:nil];
+    NSString *base64EncodedString = [NSString base64StringFromData:encryptedData length:[encryptedData length]];
+    //NSString *base64EncodedString = [encryptedData base64EncodedDataWithOptions:0];
+    return base64EncodedString;
 }
 
 + (NSString *)decrypt:(NSString *)base64EncodedString key:(NSString *)key {
-  NSData *encryptedData = [NSData base64DataFromString:base64EncodedString];
-  NSData *decryptedData = [encryptedData decryptedAES256DataUsingKey:[key dataUsingEncoding:NSUTF8StringEncoding] error:nil];
-  return [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
+    NSData *encryptedData = [NSData base64DataFromString:base64EncodedString];
+    NSData *decryptedData = [encryptedData decryptedAES256DataUsingKey:[NSData base64DataFromString:key] error:nil];
+    NSString *msg = [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
+    return msg;
 }
 
 @end

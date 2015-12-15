@@ -70,6 +70,8 @@ typedef void (^GenerateSuccessBlock)(void);
 // SET / GET Public Key
 
 - (BOOL)setPublicKey:(NSString *)keyAsBase64;
+- (NSString *)getPublicKeyPEM;
+- (NSString *)getPublicKeyDER;
 - (NSString *)getPublicKeyAsBase64;
 
 - (NSString *)getServerPublicKey;

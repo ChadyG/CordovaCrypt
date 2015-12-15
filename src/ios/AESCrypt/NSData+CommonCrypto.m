@@ -176,7 +176,7 @@ NSString * const kCommonCryptoErrorDomain = @"CommonCryptoErrorDomain";
 	CCCryptorStatus status = kCCSuccess;
 	NSData * result = [self dataEncryptedUsingAlgorithm: kCCAlgorithmAES128
                                                   key: key
-                                              options: kCCOptionPKCS7Padding
+                                              options: kCCOptionPKCS7Padding | kCCOptionECBMode
                                                 error: &status];
 	
 	if ( result != nil )
@@ -193,7 +193,7 @@ NSString * const kCommonCryptoErrorDomain = @"CommonCryptoErrorDomain";
 	CCCryptorStatus status = kCCSuccess;
 	NSData * result = [self decryptedDataUsingAlgorithm: kCCAlgorithmAES128
                                                   key: key
-                                              options: kCCOptionPKCS7Padding
+                                              options: kCCOptionPKCS7Padding | kCCOptionECBMode
                                                 error: &status];
 	
 	if ( result != nil )
@@ -282,11 +282,11 @@ static void FixKeyLengths( CCAlgorithm algorithm, NSMutableData * keyData, NSMut
 	{
 		case kCCAlgorithmAES128:
 		{
-			if ( keyLength < 16 )
+			if ( keyLength <= 16 )
 			{
 				[keyData setLength: 16];
 			}
-			else if ( keyLength < 24 )
+			else if ( keyLength <= 24 )
 			{
 				[keyData setLength: 24];
 			}
@@ -479,7 +479,7 @@ static void FixKeyLengths( CCAlgorithm algorithm, NSMutableData * keyData, NSMut
 	NSParameterAssert(iv == nil || [iv isKindOfClass: [NSData class]] || [iv isKindOfClass: [NSString class]]);
 	
 	NSMutableData * keyData, * ivData;
-	if ( [key isKindOfClass: [NSData class]] )
+    if ( [key isKindOfClass: [NSData class]])
 		keyData = (NSMutableData *) [key mutableCopy];
 	else
 		keyData = [[key dataUsingEncoding: NSUTF8StringEncoding] mutableCopy];
