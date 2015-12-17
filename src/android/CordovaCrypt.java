@@ -29,10 +29,6 @@ import org.json.JSONObject;
 import com.scottyab.aescrypt.AESCrypt;
 import java.security.GeneralSecurityException;
 
-import javax.crypto;
-import javax.crypto.interfaces;
-import javax.crypto.spec;
-
 public class CordovaCrypt extends CordovaPlugin
 {
   private static final String TAG = "SCG";
@@ -83,12 +79,12 @@ public class CordovaCrypt extends CordovaPlugin
       callbackContext.success();
       return true;
     }
-    if ("encryptPrivate".equals(action)) {
+    if ("encryptPublic".equals(action)) {
       this.encryptRSAAction(args, callbackContext);
       callbackContext.success();
       return true;
     }
-    if ("decryptPublic".equals(action)) {
+    if ("decryptPrivate".equals(action)) {
       this.decryptRSAAction(args, callbackContext);
       callbackContext.success();
       return true;
@@ -112,13 +108,13 @@ public class CordovaCrypt extends CordovaPlugin
       CryptoRSA.initialize();
 
       PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
-    }catch (GeneralSecurityException e){
+    }catch (Exception e){
       addProperty(returnObj, keyError, errorEncrypt);
       addProperty(returnObj, keyMessage, e.getMessage());
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
     }
   }
@@ -133,13 +129,13 @@ public class CordovaCrypt extends CordovaPlugin
 
     try {
       PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
-    }catch (GeneralSecurityException e){
+    }catch (Exception e){
       addProperty(returnObj, keyError, errorEncrypt);
       addProperty(returnObj, keyMessage, e.getMessage());
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
     }
   }
@@ -156,29 +152,29 @@ public class CordovaCrypt extends CordovaPlugin
 
       addProperty(returnObj, keyPublic, pemKey);
       PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
-    }catch (GeneralSecurityException e){
+    }catch (Exception e){
       addProperty(returnObj, keyError, errorEncrypt);
       addProperty(returnObj, keyMessage, e.getMessage());
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
     }
   }
 
-  public void encryptPublicAction(JSONArray args, CallbackContext callbackContext)
+  public void encryptRSAAction(JSONArray args, CallbackContext callbackContext)
   {
     JSONObject returnObj = new JSONObject();
     JSONObject obj = getArgsObject(args);
     String message = getString(obj);
 
-    log("encryptPublicAction obj: " + obj.toString() + "\n message: " + message);
+    log("encryptRSAAction obj: " + obj.toString() + "\n message: " + message);
     if (message == null) {
       addProperty(returnObj, keyError, errorParams);
       addProperty(returnObj, keyMessage, errorMessage);
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
       return;
     }
@@ -186,32 +182,32 @@ public class CordovaCrypt extends CordovaPlugin
     try {
       String encryptedMsg = CryptoRSA.encrypt(message);
 
-      addProperty(returnObj, keyMessage, decryptedMsg);
+      addProperty(returnObj, keyMessage, encryptedMsg);
 
       PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
-    }catch (GeneralSecurityException e){
+    }catch (Exception e){
       addProperty(returnObj, keyError, errorDecrypt);
       addProperty(returnObj, keyMessage, e.getMessage());
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
     }
   }
 
-  public void decryptPrivateAction(JSONArray args, CallbackContext callbackContext)
+  public void decryptRSAAction(JSONArray args, CallbackContext callbackContext)
   {
     JSONObject returnObj = new JSONObject();
     JSONObject obj = getArgsObject(args);
     String message = getString(obj);
 
-    log("decryptPrivateAction obj: " + obj.toString() + "\n message: " + message);
+    log("decryptRSAAction obj: " + obj.toString() + "\n message: " + message);
     if (message == null) {
       addProperty(returnObj, keyError, errorParams);
       addProperty(returnObj, keyMessage, errorMessage);
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
       return;
     }
@@ -222,13 +218,13 @@ public class CordovaCrypt extends CordovaPlugin
       addProperty(returnObj, keyMessage, decryptedMsg);
 
       PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
-    }catch (GeneralSecurityException e){
+    }catch (Exception e){
       addProperty(returnObj, keyError, errorDecrypt);
       addProperty(returnObj, keyMessage, e.getMessage());
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
     }
   }
@@ -246,7 +242,7 @@ public class CordovaCrypt extends CordovaPlugin
       addProperty(returnObj, keyError, errorParams);
       addProperty(returnObj, keyMessage, errorToken);
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
       return;
     }
@@ -264,7 +260,7 @@ public class CordovaCrypt extends CordovaPlugin
         addProperty(returnObj, keyError, errorParams);
         addProperty(returnObj, keyMessage, errorMessage);
         PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-        pluginResult.setKeepCallback(true);
+        pluginResult.setKeepCallback(false);
         callbackContext.sendPluginResult(pluginResult);
         return;
       }
@@ -272,13 +268,13 @@ public class CordovaCrypt extends CordovaPlugin
       addProperty(returnObj, keyMessage, encryptedMsg);
 
       PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
     }catch (GeneralSecurityException e){
       addProperty(returnObj, keyError, errorEncrypt);
       addProperty(returnObj, keyMessage, e.getMessage());
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
     }
   }
@@ -294,7 +290,7 @@ public class CordovaCrypt extends CordovaPlugin
       addProperty(returnObj, keyError, errorParams);
       addProperty(returnObj, keyMessage, errorMessage);
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
       return;
     }
@@ -302,7 +298,7 @@ public class CordovaCrypt extends CordovaPlugin
       addProperty(returnObj, keyError, errorParams);
       addProperty(returnObj, keyMessage, errorToken);
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
       return;
     }
@@ -313,13 +309,13 @@ public class CordovaCrypt extends CordovaPlugin
       addProperty(returnObj, keyMessage, decryptedMsg);
 
       PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
     }catch (GeneralSecurityException e){
       addProperty(returnObj, keyError, errorDecrypt);
       addProperty(returnObj, keyMessage, e.getMessage());
       PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-      pluginResult.setKeepCallback(true);
+      pluginResult.setKeepCallback(false);
       callbackContext.sendPluginResult(pluginResult);
     }
   }
@@ -366,7 +362,7 @@ public class CordovaCrypt extends CordovaPlugin
   private Long getData(JSONObject obj)
   {
     //Get the message string from arguments
-    Long value = obj.optLong(keyData, null);
+    Long value = obj.optLong(keyData, 0);
     return value;
   }
 
