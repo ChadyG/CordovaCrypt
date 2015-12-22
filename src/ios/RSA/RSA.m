@@ -484,18 +484,15 @@ size_t encodeLength(unsigned char * buf, size_t length) {
 }
 
 - (NSString *)rsaDecryptWithData:(NSData*)data usingPublicKey:(BOOL)yes{
-    NSData *wrappedSymmetricKey = data;
     SecKeyRef key = yes?self.publicKeyRef:self.privateKeyRef;
     
-//    key = [self getPrivateKeyRef]; // reejo remove
-    
     size_t cipherBufferSize = SecKeyGetBlockSize(key);
-    size_t keyBufferSize = [wrappedSymmetricKey length];
+    size_t keyBufferSize = [data length];
     
     NSMutableData *bits = [NSMutableData dataWithLength:keyBufferSize];
     OSStatus sanityCheck = SecKeyDecrypt(key,
-                                         kSecPaddingPKCS1,//kSecPaddingPKCS1,kSecPaddingNone,kSecPaddingOAEP
-                                         (const uint8_t *) [wrappedSymmetricKey bytes],
+                                         kSecPaddingNone,//kSecPaddingPKCS1,kSecPaddingNone,kSecPaddingOAEP
+                                         (const uint8_t *) [data bytes],
                                          cipherBufferSize,
                                          [bits mutableBytes],
                                          &keyBufferSize);
@@ -509,7 +506,7 @@ size_t encodeLength(unsigned char * buf, size_t length) {
     NSAssert(sanityCheck == noErr, @"Error decrypting, OSStatus == %ld.", (long)sanityCheck);
 #endif
     
-    [bits setLength:keyBufferSize];
+    [bits setLength:16];
     //c
     
     NSString *decData = [[NSString alloc] initWithData:bits

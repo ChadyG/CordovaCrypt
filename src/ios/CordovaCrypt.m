@@ -58,6 +58,14 @@ NSString *const scgBadDecrypt = @"Could not decrypt message;";
 
   [rsa generateKeyPairRSACompleteBlock:^{
       //NSLog(@"Key generated and public key shown");
+      
+//      crypt = [CryptoRSA sharedInstance];
+//      [crypt setPublicKeyStr:[rsa getPublicKeyPEM]];
+//      NSString* message = @"Hello World";
+//      NSString* encTest = [crypt encrypt:[message dataUsingEncoding:NSUTF8StringEncoding]];
+//      NSString* decrypted = [rsa decryptUsingPrivateKeyWithData:[NSData dataFromBase64String:encTest]];
+//      NSLog([NSString stringWithFormat:@"encrypted %@", message]);
+//      NSLog([NSString stringWithFormat:@"decrypted %@", decrypted]);
   }];
 #endif
 

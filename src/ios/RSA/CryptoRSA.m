@@ -60,7 +60,12 @@ const size_t kCSecAttrKeySizeInBitsLength = 2048;
     publicBufferSize = size;
     publicPEM = [cexport exportPublicKeyToPEM:key keyType:kSecAttrKeyTypeRSA keySize:kCSecAttrKeySizeInBitsLength];
     
-    BIO *bio = BIO_new_mem_buf([publicPEM cStringUsingEncoding:NSUTF8StringEncoding], -1);
+    [self setPublicKeyStr:publicPEM];
+}
+
+-(void) setPublicKeyStr:(NSString *)key
+{
+    BIO *bio = BIO_new_mem_buf([key cStringUsingEncoding:NSUTF8StringEncoding], -1);
     NSLog(@"Pubkey from mem");
     
     
@@ -83,7 +88,12 @@ const size_t kCSecAttrKeySizeInBitsLength = 2048;
     privateBufferSize = size;
     NSString* private_pem = [cexport exportPublicKeyToPEM:key keyType:kSecAttrKeyTypeRSA keySize:kCSecAttrKeySizeInBitsLength];
     
-    BIO *bio = BIO_new_mem_buf([private_pem cStringUsingEncoding:NSUTF8StringEncoding], -1);
+    [self setPrivateKeyStr:private_pem ];
+}
+
+-(void) setPrivateKeyStr:(NSString *)key
+{
+    BIO *bio = BIO_new_mem_buf([key cStringUsingEncoding:NSUTF8StringEncoding], -1);
     
     if(bio == NULL)
     {

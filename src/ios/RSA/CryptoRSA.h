@@ -18,6 +18,8 @@
 
 -(void) setPublicKey:(NSData*)key withSize:(size_t)size;
 -(void) setPrivateKey:(NSData*)key withSize:(size_t)size;
+-(void) setPublicKeyStr:(NSString*)key;
+-(void) setPrivateKeyStr:(NSString*)key;
 
 -(NSString*) getPublicKey;
 
